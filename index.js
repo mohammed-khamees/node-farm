@@ -2,22 +2,48 @@ const fs = require('fs');
 const http = require('http');
 const url = require('url');
 
+const tempOverview = fs.readFileSync(
+	`${__dirname}/templates/template-overview.html`,
+	'utf-8',
+);
+const tempCard = fs.readFileSync(
+	`${__dirname}/templates/template-card.html`,
+	'utf-8',
+);
+const tempProduct = fs.readFileSync(
+	`${__dirname}/templates/template-product.html`,
+	'utf-8',
+);
+
+const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
+
+const dataObj = JSON.parse(data);
+
+//Server
 const server = http.createServer((req, res) => {
 	const pathName = req.url;
 
+	//OVERVIEW PAGE
 	if (pathName === '/' || pathName === '/overview') {
-		res.end('This is the Overview');
+		res.writeHead(200, {
+			'Content-type': 'text/html',
+		});
+		res.end(tempOverview);
+
+		//PRODUCT PAGE
 	} else if (pathName === '/product') {
 		res.end('This is the Product');
-	} else if (pathName === '/api') {
-		fs.readFile(`${__dirname}/dev-data/data.json`, 'utf-8', (err, data) => {
-			const productData = JSON.parse(data);
-			console.log(productData);
-		});
 
-		res.end('API');
+		//API
+	} else if (pathName === '/api') {
+		res.writeHead(200, {
+			'Content-type': 'application/json',
+		});
+		res.end(data);
+
+		//NOT FOUND
 	} else {
-		res.writeHead('404', {
+		res.writeHead(404, {
 			'Content-type': 'text/html',
 			'my-own-header': 'hello-world',
 		});
